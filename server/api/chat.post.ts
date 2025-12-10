@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
 
   try {
-    const response = await $fetch("https://agent.rinal.dev/test/webhook", {
+    const response = await $fetch("http://127.0.0.1:8571/test/webhook", {
       method: "POST",
       body: {
         From: body.from || "user-" + Math.floor(Math.random() * 10000),
