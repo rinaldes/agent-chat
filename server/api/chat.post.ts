@@ -1,22 +1,45 @@
-export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const config = useRuntimeConfig();
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
-  try {
-    const response = await $fetch("http://127.0.0.1:8571/test/webhook", {
-      method: "POST",
-      body: {
-        From: body.from || "user-" + Math.floor(Math.random() * 10000),
-        Body: body.message,
-        History: body.history || [], // Pass conversation history
-      },
-    });
-    return response;
-  } catch (error) {
-    console.error("Error forwarding to backend:", error);
+interface ChatRequest {
+  from?: string;
+  message: string;
+  history?: ChatMessage[];
+}
+
+export default defineEventHandler(async (event) => {
+  const body = await readBody<ChatRequest>(event);
+  const webhookUrl = process.env.WEBHOOK_URL;
+
+  if (!webhookUrl) {
     throw createError({
       statusCode: 500,
-      statusMessage: "Failed to communicate with chatbot backend",
+      statusMessage: 'WEBHOOK_URL is not configured',
+    });
+  }
+
+  try {
+    const response = await $fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: {
+        from: body.from || `user-${Math.floor(Math.random() * 10000)}`,
+        message: body.message,
+        history: body.history || [],
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Error forwarding to backend:', error);
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to communicate with chatbot backend',
+      data: error,
     });
   }
 });

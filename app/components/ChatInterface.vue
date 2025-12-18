@@ -4,6 +4,11 @@ interface Message {
   content: string;
 }
 
+interface ApiChatResponse {
+  from?: string;
+  body?: string;
+}
+
 const messages = ref<Message[]>([
   { role: "assistant", content: "Hello! How can I help you today?" },
 ]);
@@ -20,24 +25,16 @@ const sendMessage = async () => {
   isLoading.value = true;
 
   try {
-    const response = await $fetch<any>("/api/chat", {
+    const response = await $fetch<ApiChatResponse>("/api/chat", {
       method: "POST",
       body: {
         message: userMessage,
         from: "user-123", // You might want to make this dynamic later
-        history: messages.value, // Include conversation history
       },
     });
 
-    const content =
-      typeof response === "string"
-        ? response
-        : response.reply ||
-          response.message ||
-          response.body ||
-          JSON.stringify(response);
-
-    messages.value.push({ role: "assistant", content: content });
+    const content = response?.body ?? JSON.stringify(response);
+    messages.value.push({ role: "assistant", content });
   } catch (error) {
     console.error("Failed to send message:", error);
     messages.value.push({
