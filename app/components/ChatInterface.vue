@@ -4,11 +4,13 @@ interface Message {
   content: string;
   timestamp: string;
   status?: "sent" | "delivered" | "read";
+  images?: string[];
 }
 
 interface ApiChatResponse {
   from?: string;
   body?: string;
+  images?: string[];
 }
 
 const formatTime = () =>
@@ -17,8 +19,11 @@ const formatTime = () =>
 const messages = ref<Message[]>([
   {
     role: "assistant",
-    content: "Hello! How can I help you today?",
+    content: "🍓✨ *Selamat datang!* 🎊\n\nRayakan Chinese New Year dengan *Hampers Spesial* dari kami! 🧧\n\n📦 *Pilihan Hampers Chinese New Year:*\n\n• *Hampers Totome* - Rp 180.000\n  1x Totome A15 dengan kemasan lucu\n\n• *Hampers Momoka* - Rp 200.000\n  1x Momoka M6 dengan kemasan lucu\n\n• *Hampers Momoka & Hatsu* - Rp 400.000\n  1x Hatsu 6 & 1x Momoka M6\n\n🌸 Semua stroberi kami *segar, manis, dan berkualitas premium*! Sempurna untuk hadiah atau nikmati sendiri.\n\n❓ Mau pesan yang mana? Atau butuh info lebih lanjut? 😊",
     timestamp: formatTime(),
+    images: [
+      "/catalogue.jpg"
+    ],
   },
 ]);
 const input = ref("");
@@ -66,6 +71,7 @@ const sendMessage = async () => {
       role: "assistant",
       content,
       timestamp: formatTime(),
+      images: response?.images || [],
     });
   } catch (error) {
     console.error("Failed to send message:", error);
