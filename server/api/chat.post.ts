@@ -38,10 +38,6 @@ export default defineEventHandler(async (event) => {
     return response;
   } catch (error) {
     console.error('Error forwarding to backend:', error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Failed to communicate with chatbot backend',
-      data: error,
-    });
+    throw error;
   }
 });
